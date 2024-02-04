@@ -3,9 +3,9 @@ import "flatpickr/dist/flatpickr.min.css";
 import iziToast from "izitoast";
 import "izitoast/dist/css/iziToast.min.css";
 
-const startBtn = document.querySelector('button[data-action-start]');
-const stopBtn = document.querySelector('button[data-action-stop]');
-const clockface = document.querySelector('.js-clockface');
+const startBtn = document.querySelector('button[data-start]');
+const selectedDates = document.querySelector('input#datetime-picker');
+// const clockface = document.querySelector('.js-clockface');
 
 class Timer {
   constructor(tick) {
@@ -43,7 +43,7 @@ const timer = new Timer(onTick);
 
 startBtn.addEventListener('click', () => {
   timer.start();
-  flatpickr(input#datetime-picker, options)
+  flatpickr(selectedDates, options)
   const options = {
     enableTime: true,
     time_24hr: true,
