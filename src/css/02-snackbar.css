@@ -23,6 +23,7 @@
     border: 1px solid #808080;
     justify-content: center;
     align-items: last baseline;
+    outline: transparent;
   }
 
   label {
@@ -32,6 +33,7 @@
 
   input {
     margin-top: 8px;
+    outline: transparent;
   }
 
   button {
@@ -53,10 +55,14 @@
     letter-spacing: 0.04em;
 }
 
+input:hover {
+  border: 1px solid #000;
+}
+
+input:active {
+  border: 1px solid #4e75ff;
+}
+
 button:hover {
     background: #6c8cff;
-}
-button:disabled {
-    background: #cfcfcf;
-    color: #989898;
 }
