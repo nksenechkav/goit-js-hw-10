@@ -1,4 +1,5 @@
 .form {
+  margin-left: 50px;
     display: flex;
     flex-direction: column;
     width: 360px;
@@ -11,7 +12,12 @@
     letter-spacing: 0.04em;
     color: #2e2f42;
   }
-  
+  .numDelay {
+    width: 360px;
+    height: 40px;
+  }
+
+
   fieldset {
     margin-top: 24px;
     display: flex;
@@ -55,11 +61,11 @@
     letter-spacing: 0.04em;
 }
 
-input:hover {
+.numDelay:hover, fieldset:hover{
   border: 1px solid #000;
 }
 
-input:active {
+.numDelay:active, fieldset:active {
   border: 1px solid #4e75ff;
 }
 
