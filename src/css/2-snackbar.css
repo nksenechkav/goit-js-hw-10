@@ -1,5 +1,11 @@
+p {
+  padding-left: 20px;
+  padding-top: 20px;
+}
+
 .form {
-  margin-left: 50px;
+    margin-top: 20px;
+    margin-left: 50px;
     display: flex;
     flex-direction: column;
     width: 360px;
