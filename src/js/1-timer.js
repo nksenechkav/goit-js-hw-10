@@ -34,8 +34,8 @@ const options = {
   onClose(selectedDates) {
     if (Date.now() > selectedDates[0].getTime()) {
       iziToast.error({
-        message: 'Please choose a date in the future',
-        position: 'topRight',
+        title: "❌ You made a mistake",
+        message: "Please choose a date in the future",
       });
     } else if (Date.now() < selectedDates[0].getTime()) {
       startButton.addEventListener('click', () => {
