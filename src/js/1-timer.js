@@ -3,85 +3,99 @@ import "flatpickr/dist/flatpickr.min.css";
 import iziToast from "izitoast";
 import "izitoast/dist/css/iziToast.min.css";
 
-const datePicker = flatpickr('#datetime-picker');
+// Отримуємо доступ до поля вибору дати
+const input = document.querySelector('#datetime-picker');
+input.disabled = false;
 
-  // Отримуємо кнопку Start та розміщаємо її у змінній
-  const startButton = document.querySelector('[data-start]');
+// Отримуємо кнопку Start та розміщаємо її у змінній та деактивуємо її напочатку
+const startButton = document.querySelector('[data-start]');
+startButton.disabled = true;
 
-  // Поточна вибрана дата
-  let selectedDate = null;
+// Поточна вибрана дата
+let userSelectedDate;
 
-  // Функція для перевірки, чи дата вибрана з майбутнього
-  function isFutureDate(date) {
-    const currentDate = new Date();
-    return date.getTime() > currentDate.getTime();
-  }
+// Додаємо опції вибору дати та перевіряємо її валідність відповідно чи є вибрана дата більшою за теперішню
+const options = {
+  enableTime: true,
+  time_24hr: true,
+  defaultDate: new Date(),
+  minuteIncrement: 1,
 
-  // Функція для оновлення таймера
-  function updateTimer() {
-    // Отримуємо поточну дату та час
-    const currentDate = new Date();
-
-    // Розраховуємо різницю між поточною датою та вибраною датою
-    const difference = selectedDate.getTime() - currentDate.getTime();
-
-    // Якщо різниця менше або дорівнює нулю, таймер зупиняється
-    if (difference === 0) {
-      clearInterval(timerInterval);
-      difference = 0;
-
-      // Повідомлення про закінчення таймера
-      iziToast.show({
-        title: 'Timer Finished',
-        message: 'The selected time has passed.',
-        position: 'topCenter',
-        timeout: 5000,
-        progressBarColor: 'rgb(0, 255, 0)'
-      });
-    }
-
-    // Отримуємо час у форматі дні:години:хвилини:секунди
-    const days = Math.floor(difference / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
-    const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, '0');
-    const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
-    const seconds = Math.floor((difference % (1000 * 60)) / 1000).toString().padStart(2, '0');
-
-    // Відображаємо час у відповідні елементи інтерфейсу
-    document.querySelector('[data-days]').textContent = days;
-    document.querySelector('[data-hours]').textContent = hours;
-    document.querySelector('[data-minutes]').textContent = minutes;
-    document.querySelector('[data-seconds]').textContent = seconds;
-  }
-
-  // Обробники подій
-
-  // Коли обрано дату, перевіряємо, чи вона з майбутнього
-  datePicker.config.onChange = function(selectedDates) {
-    const date = selectedDates[0];
-    selectedDate = date;
-    if (isFutureDate(date)) {
+  onChange(selectedDates) {
+    if (Date.now() < selectedDates[0].getTime()) {
       startButton.disabled = false;
-      iziToast.hide();
+      userSelectedDate = selectedDates[0];
     } else {
       startButton.disabled = true;
+    }
+    console.log(selectedDates[0].getTime());
+  },
+
+  onClose(selectedDates) {
+    if (Date.now() > selectedDates[0].getTime()) {
       iziToast.error({
-        title: 'Please choose a date in the future',
-        position: 'topCenter',
-        timeout: false
+        message: 'Please choose a date in the future',
+        position: 'topRight',
+      });
+    } else if (Date.now() < selectedDates[0].getTime()) {
+      startButton.addEventListener('click', () => {
+        startTimer(selectedDates[0]);
       });
     }
-  };
+  },
+};
 
-  // При кліку на кнопку Start, таймер запускається
-  startButton.addEventListener('click', function() {
-    if (selectedDate !== null) {
-      // Відключаємо кнопку Start
-      startButton.disabled = true;
+flatpickr(input, options);
+  
+// Після вибору валідної дати реалізовуємо конвертацію обраного інтервалу часу в указаний формат для відображення в полях таймеру на сторінці
 
-      // Встановлюємо оновлення таймера кожну секунду
-      timerInterval = setInterval(updateTimer, 1000);
+function startTimer(chooseDate) {
+  const days = document.querySelector('[data-days]');
+  const hours = document.querySelector('[data-hours]');
+  const minutes = document.querySelector('[data-minutes]');
+  const seconds = document.querySelector('[data-seconds]');
+
+  const intervalId = setInterval(() => {
+    const {
+      days: daysValue,
+      hours: hoursValue,
+      minutes: minutesValue,
+      seconds: secondsValue,
+    } = convertMs(chooseDate.getTime() - Date.now());
+
+      days.textContent = `${daysValue}`.padStart(2, '0');
+      hours.textContent = `${hoursValue}`.padStart(2, '0');
+      minutes.textContent = `${minutesValue}`.padStart(2, '0');
+      seconds.textContent = `${secondsValue}`.padStart(2, '0');
+
+// Запускаємо відлік часу на живій сторінці та блокуємо поле вибору дати
+
+  function timeIsUp() {
+    input.disabled = true;
+    const result =
+      parseInt(days.textContent) === 0 &&
+      parseInt(hours.textContent) === 0 &&
+      parseInt(minutes.textContent) === 0 &&
+      parseInt(seconds.textContent) === 0;
+      return result;
     }
-  });
+
+// Після закінчення відліку обраного інтервалу часу Зупиняємо роботу таймера та очищаємо його поля і знову робимо поле вибору дати доступним, а кнопку неактивною
+
+  function stopTimer() {
+      clearInterval(intervalId);
+    }
+    if (timeIsUp() === true) {
+      stopTimer();
+      input.disabled = false;
+    }
+  }, 1000);
+  
+  startButton.disabled = true;
+  
+}
+
+// Функція для підрахунку значень між кінцевою і поточною датою, яка повертає значення в мілісекундах
 
 function convertMs(ms) {
   // Number of milliseconds per unit of time
@@ -101,8 +115,3 @@ function convertMs(ms) {
 
   return { days, hours, minutes, seconds };
 }
-
-console.log(convertMs(2000)); // {days: 0, hours: 0, minutes: 0, seconds: 2}
-console.log(convertMs(140000)); // {days: 0, hours: 0, minutes: 2, seconds: 20}
-console.log(convertMs(24140000)); // {days: 0, hours: 6 minutes: 42, seconds: 20}
-

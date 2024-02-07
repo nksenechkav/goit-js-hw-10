@@ -3,6 +3,7 @@ import "izitoast/dist/css/iziToast.min.css";
 
 const delaynum = document.querySelector("input[name='delay']");
 delaynum.classList.add('numDelay');
+
 document.querySelector("button[type='submit']").addEventListener("click", function (event) {
   event.preventDefault(); // Забороняємо перезавантаження сторінки після натискання кнопки
 
